@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  firstName  String
+  lastName   String
+  email      String   @unique
+  password   String // Hashed password
+  phone      String
+  createdAt  DateTime @default(now())
+  isActive   Boolean  @default(true)
+  createdBy  String? // Admin who created the user (email)
+  modifiedBy String? // Admin who last modified the user (email)
+  sessions   Session[] // Sessions for admin auth
+  bookings   Booking[] @relation("ModifiedByBooking") // Bookings modified by this admin
+  buses      Bus[]     @relation("ModifiedByBus") // Buses modified by this admin
+  trips      Trip[]    @relation("ModifiedByTrip") // Trips modified by this admin
+  busTypes   BusType[] @relation("ModifiedByBusType") // Bus types modified by this admin
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique // Token stored in localStorage as adminAuth
+  createdAt DateTime @default(now())
+  expiresAt DateTime // Session expiration
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Bus {
+  id         String   @id @default(uuid())
+  operator   String
+  busType    String // References BusType.name (not a foreign key for flexibility)
+  seatLayout Json // { rows: number, columns: number, arrangement: string[][] }
+  amenities  String[] // Array of amenities (e.g., ["AC", "WiFi"])
+  rating     Float
+  createdAt  DateTime @default(now())
+  createdBy  String? // Admin email
+  modifiedBy String? // Admin email
+  seats      Seat[] // Embedded seats
+  trips      Trip[] // Trips associated with this bus
+  bookings   Booking[] @relation("BusBooking") // Bookings for this bus
+  user       User?    @relation("ModifiedByBus", fields: [modifiedBy], references: [email])
+}
+
+model Seat {
+  id           String  @id @default(uuid())
+  busId        String
+  number       String // e.g., "1A"
+  isAvailable  Boolean @default(true)
+  bus          Bus     @relation(fields: [busId], references: [id], onDelete: Cascade)
+  @@unique([busId, number]) // Ensure unique seat numbers per bus
+}
+
+model Trip {
+  id            String   @id @default(uuid())
+  busId         String
+  from          String
+  to            String
+  date          DateTime // Trip date
+  departureTime String // e.g., "07:00"
+  arrivalTime   String // e.g., "15:00"
+  duration      String // e.g., "8h 0m"
+  price         Float // Price per seat in NGN
+  isAvailable   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  createdBy     String? // Admin email
+  modifiedBy    String? // Admin email
+  bus           Bus      @relation(fields: [busId], references: [id], onDelete: Cascade)
+  bookings      Booking[] // Bookings for this trip
+  user          User?    @relation("ModifiedByTrip", fields: [modifiedBy], references: [email])
+}
+
+model Booking {
+  reference     String   @id @unique // e.g., "TE12345678"
+  status        String // "confirmed" | "cancelled" | "completed"
+  tripId        String
+  busId         String
+  from          String
+  to            String
+  date          String // e.g., "2025-07-29"
+  time          String // e.g., "07:00"
+  operator      String
+  passengers    Passenger[] // Embedded passengers
+  email         String
+  phone         String
+  totalAmount   Float // Total price in NGN
+  bookingDate   String // e.g., "2025-07-25"
+  createdAt     DateTime @default(now())
+  createdBy     String? // Admin email (if created by admin)
+  modifiedBy    String? // Admin email
+  trip          Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  bus           Bus      @relation("BusBooking", fields: [busId], references: [id], onDelete: Cascade)
+  user          User?    @relation("ModifiedByBooking", fields: [modifiedBy], references: [email])
+  paymentReference String?    @unique
+}
+
+model Passenger {
+  id         String  @id @default(uuid())
+  bookingId  String
+  name       String
+  seat       String // Seat number (e.g., "1A")
+  age        Int
+  gender     String
+  booking    Booking @relation(fields: [bookingId], references: [reference], onDelete: Cascade)
+  @@unique([bookingId, seat]) // Ensure unique seat per booking
+}
+
+model BusType {
+  id         String   @id @default(uuid())
+  name       String   @unique // e.g., "Standard", "Luxury"
+  seats      Int // Total number of seats (e.g., 48)
+  createdAt  DateTime @default(now())
+  createdBy  String? // Admin email
+  modifiedBy String? // Admin email
+  user       User?    @relation("ModifiedByBusType", fields: [modifiedBy], references: [email])
+}
