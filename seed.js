@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'; // Adjust the import path as necessary
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -28,8 +28,8 @@ async function main() {
     ];
 
     const busTypes = [
-        { id: "1", name: "Standard", seats: 48 },
-        { id: "2", name: "Luxury", seats: 32 },
+        { id: "1", name: "48 Seater", seats: 48 },
+        { id: "2", name: "32 Seater", seats: 32 },
     ];
 
     for (const user of users) {
