@@ -10,6 +10,7 @@ const pagesWithLayout = [
   "/contact",
   "/about",
   "/booking-confirmation",
+  "/terms-of-service",
 ];
 
 export default function ConditionalLayout({

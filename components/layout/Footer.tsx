@@ -37,14 +37,14 @@ export default function Footer() {
                   Track Booking
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   href="/contact"
                   className="hover:text-white transition-colors"
                 >
                   Help Center
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/about"
@@ -68,11 +68,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
+                <Link
+                  href="/terms-of-service"
+                  className="hover:text-white transition-colors"
+                >
                   Terms of Service
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link href="#" className="hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
@@ -81,7 +84,7 @@ export default function Footer() {
                 <Link href="#" className="hover:text-white transition-colors">
                   Refund Policy
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
 
