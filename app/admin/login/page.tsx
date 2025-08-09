@@ -150,14 +150,6 @@ export default function AdminLogin() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">Demo Credentials</h4>
-            <div className="text-sm text-blue-700">
-              <p>Email: admin@kadzai.com</p>
-              <p>Password: admin</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
